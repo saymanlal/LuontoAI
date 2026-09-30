@@ -1,160 +1,179 @@
 "use client";
 
 import React from "react";
-import { ArrowDown, Sparkles, RefreshCw, Layers, Box, Cpu } from "lucide-react";
+import { ArrowDown, Sparkles, Layers, Box, Cpu, Repeat, ShieldCheck, TreePine } from "lucide-react";
 
 interface HeroProps {
   onExploreClick: () => void;
   onHowItWorksClick: () => void;
+  onMultiBlendClick: () => void;
 }
 
-export const Hero: React.FC<HeroProps> = ({ onExploreClick, onHowItWorksClick }) => {
+export const Hero: React.FC<HeroProps> = ({ onExploreClick, onHowItWorksClick, onMultiBlendClick }) => {
   return (
     <section className="relative pt-12 pb-16 md:pt-20 md:pb-24 overflow-hidden">
-      {/* Subtle Nordic atmospheric background accents */}
-      <div className="absolute top-0 right-1/4 w-96 h-96 bg-[#edf2ee]/70 rounded-full blur-3xl -z-10 pointer-events-none" />
-      <div className="absolute top-1/3 left-1/4 w-80 h-80 bg-[#e8eef5]/60 rounded-full blur-3xl -z-10 pointer-events-none" />
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
           {/* Hero Left Content */}
           <div className="lg:col-span-7 space-y-6">
-            <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-[#edf2ee] border border-[#cbd2cb]/60 text-xs font-semibold uppercase tracking-wider text-[#1e3a2b]">
-              <span className="w-2 h-2 rounded-full bg-[#1e3a2b]" />
-              <span>Finland · Circular Innovation</span>
+            <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-[#142634] border border-[#38bdf8]/40 text-xs font-mono uppercase tracking-wider text-[#a5f3fc]">
+              <span className="w-2 h-2 rounded-full bg-[#38ef7d] animate-pulse" />
+              <span>Finland · Circular Bioeconomy & Materials Intelligence</span>
             </div>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif tracking-tight text-[#1c211f] leading-[1.12]">
-              What if waste was the <span className="italic font-normal text-[#1e3a2b]">beginning</span>, not the end?
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif tracking-tight text-white leading-[1.12]">
+              What if waste was the <span className="italic font-normal text-[#38ef7d]">beginning</span>, not the end?
             </h1>
 
-            <p className="text-lg sm:text-xl text-[#667069] max-w-2xl font-normal leading-relaxed">
-              LuontoAI discovers sustainable resource and product possibilities hidden inside everyday waste.
+            <p className="text-base sm:text-lg text-[#94a3b8] max-w-2xl font-normal leading-relaxed">
+              LuontoAI engineers regenerative resource pathways from single or combined waste streams. Co-compound multi-waste composites, target exact product ideas, and compare circular replacements against conventional fossil materials.
             </p>
 
-            <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
+            <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center space-y-3 sm:space-y-0 sm:space-x-3">
               <button
                 onClick={onExploreClick}
-                className="inline-flex items-center justify-center space-x-2.5 px-6 py-3.5 rounded-lg bg-[#1e3a2b] hover:bg-[#2d5a43] text-white font-medium text-base transition-all shadow-xs hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a2b] focus:ring-offset-2 cursor-pointer"
+                className="nordic-button-primary inline-flex items-center justify-center space-x-2.5 px-6 py-3.5 rounded-xl font-medium text-base shadow-xs hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#38ef7d] cursor-pointer"
               >
-                <Sparkles className="w-4 h-4 text-[#edf2ee]" />
-                <span>Explore a Material</span>
+                <Sparkles className="w-4 h-4 text-[#a5f3fc]" />
+                <span>Explore a Waste Stream</span>
+              </button>
+
+              <button
+                onClick={onMultiBlendClick}
+                className="inline-flex items-center justify-center space-x-2 px-5 py-3.5 rounded-xl bg-[#142334] hover:bg-[#1c3046] text-[#a5f3fc] font-medium text-base border border-[#38bdf8]/30 transition-all focus:outline-none focus:ring-2 focus:ring-[#38bdf8] cursor-pointer"
+              >
+                <Layers className="w-4 h-4 text-[#38ef7d]" />
+                <span>Compound Multiple Wastes</span>
               </button>
 
               <button
                 onClick={onHowItWorksClick}
-                className="inline-flex items-center justify-center space-x-2 px-6 py-3.5 rounded-lg bg-white hover:bg-[#edf2ee] text-[#1c211f] font-medium text-base border border-[#e6e8e5] transition-all focus:outline-none focus:ring-2 focus:ring-[#1e3a2b] cursor-pointer"
+                className="inline-flex items-center justify-center space-x-2 px-4 py-3.5 rounded-xl bg-transparent hover:bg-white/5 text-[#94a3b8] hover:text-white font-medium text-sm transition-all focus:outline-none cursor-pointer"
               >
                 <span>How It Works</span>
-                <ArrowDown className="w-4 h-4 text-[#667069]" />
+                <ArrowDown className="w-4 h-4" />
               </button>
             </div>
 
             {/* Quick trust metrics bar */}
-            <div className="pt-6 border-t border-[#e6e8e5] grid grid-cols-3 gap-4 text-left">
+            <div className="pt-6 border-t border-[#243547] grid grid-cols-3 gap-4 text-left">
               <div>
-                <div className="text-xs uppercase tracking-wider text-[#667069] font-mono">Approach</div>
-                <div className="text-sm font-semibold text-[#1c211f] mt-0.5">Closed-Loop</div>
+                <div className="text-[11px] uppercase tracking-wider text-[#94a3b8] font-mono">Approach</div>
+                <div className="text-sm font-semibold text-white mt-0.5 flex items-center space-x-1">
+                  <TreePine className="w-3.5 h-3.5 text-[#38ef7d]" />
+                  <span>Cascade Loops</span>
+                </div>
               </div>
               <div>
-                <div className="text-xs uppercase tracking-wider text-[#667069] font-mono">Engine</div>
-                <div className="text-sm font-semibold text-[#1c211f] mt-0.5">Groq LPU AI</div>
+                <div className="text-[11px] uppercase tracking-wider text-[#94a3b8] font-mono">Intelligence</div>
+                <div className="text-sm font-semibold text-white mt-0.5 flex items-center space-x-1">
+                  <Cpu className="w-3.5 h-3.5 text-[#38bdf8]" />
+                  <span>Groq AI LPU</span>
+                </div>
               </div>
               <div>
-                <div className="text-xs uppercase tracking-wider text-[#667069] font-mono">Context</div>
-                <div className="text-sm font-semibold text-[#1c211f] mt-0.5">Nordic Bioeconomy</div>
+                <div className="text-[11px] uppercase tracking-wider text-[#94a3b8] font-mono">Standard</div>
+                <div className="text-sm font-semibold text-white mt-0.5 flex items-center space-x-1">
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#38ef7d]" />
+                  <span>Honest Metrics</span>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Hero Right Visual: Custom SVG/CSS Circular Loop Diagram */}
+          {/* Hero Right Visual: Frosted Glass Circular Flow Card */}
           <div className="lg:col-span-5 flex justify-center">
-            <div className="w-full max-w-md bg-white border border-[#e6e8e5] rounded-2xl p-6 sm:p-8 shadow-xs relative">
-              <div className="flex items-center justify-between pb-4 mb-6 border-b border-[#e6e8e5]">
+            <div className="w-full max-w-md nordic-card rounded-2xl p-6 sm:p-7 shadow-xl relative overflow-hidden">
+              {/* Subtle top ice glow line */}
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#11998e] via-[#38ef7d] to-[#38bdf8]" />
+
+              <div className="flex items-center justify-between pb-4 mb-5 border-b border-[#243547]">
                 <div className="flex items-center space-x-2">
-                  <RefreshCw className="w-4 h-4 text-[#1e3a2b] animate-[spin_10s_linear_infinite]" />
-                  <span className="text-xs font-mono uppercase tracking-widest text-[#1e3a2b] font-semibold">
-                    Circular Discovery Cycle
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#38ef7d] animate-ping" />
+                  <span className="text-xs font-mono uppercase tracking-widest text-[#a5f3fc] font-semibold">
+                    Regenerative Cycle
                   </span>
                 </div>
-                <span className="text-[11px] font-mono text-[#667069]">4-Node Loop</span>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#1b2b3a] text-[#94a3b8] border border-[#243547]">
+                  Continuous Loop ↺
+                </span>
               </div>
 
               {/* Loop Pathway Nodes */}
-              <div className="relative space-y-4">
-                {/* Node 1: Waste */}
-                <div className="flex items-center justify-between p-3.5 rounded-xl bg-[#f4f5f2] border border-[#e6e8e5]">
+              <div className="space-y-3">
+                {/* Node 1: Waste Input */}
+                <div className="flex items-center justify-between p-3 rounded-xl bg-[#0e1924] border border-[#243547]">
                   <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 rounded-lg bg-[#667069]/15 flex items-center justify-center text-[#1c211f] font-mono font-semibold text-xs">
+                    <div className="w-7 h-7 rounded-lg bg-[#243547] flex items-center justify-center text-[#cbd5e1] font-mono text-xs font-semibold">
                       01
                     </div>
                     <div>
-                      <div className="text-xs font-mono uppercase tracking-wider text-[#667069]">Source Input</div>
-                      <div className="text-sm font-semibold text-[#1c211f]">WASTE MATERIAL</div>
+                      <div className="text-[10px] font-mono uppercase tracking-wider text-[#94a3b8]">Input Waste</div>
+                      <div className="text-xs font-semibold text-white">Single or Compounded Wastes</div>
                     </div>
                   </div>
-                  <span className="text-xs text-[#667069] font-serif italic">Residual fraction</span>
+                  <span className="text-[11px] text-[#94a3b8] font-mono">Organic/Tech</span>
                 </div>
 
-                <div className="flex justify-center -my-2 text-[#1e3a2b]">
-                  <ArrowDown className="w-4 h-4 text-[#1e3a2b]" />
+                <div className="flex justify-center -my-1 text-[#38ef7d]">
+                  <ArrowDown className="w-3.5 h-3.5 text-[#38ef7d]" />
                 </div>
 
-                {/* Node 2: AI Analysis */}
-                <div className="flex items-center justify-between p-3.5 rounded-xl bg-[#e8eef5]/60 border border-[#2b4c7e]/20">
+                {/* Node 2: Groq Intelligence */}
+                <div className="flex items-center justify-between p-3 rounded-xl bg-[#132333] border border-[#38bdf8]/30">
                   <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 rounded-lg bg-[#2b4c7e] flex items-center justify-center text-white">
-                      <Cpu className="w-4 h-4" />
+                    <div className="w-7 h-7 rounded-lg bg-[#11998e]/30 border border-[#38ef7d]/40 flex items-center justify-center text-[#38ef7d]">
+                      <Cpu className="w-3.5 h-3.5" />
                     </div>
                     <div>
-                      <div className="text-xs font-mono uppercase tracking-wider text-[#2b4c7e]">Intelligence</div>
-                      <div className="text-sm font-semibold text-[#1c211f]">AI RESOURCE DISCOVERY</div>
+                      <div className="text-[10px] font-mono uppercase tracking-wider text-[#a5f3fc]">AI Formulation</div>
+                      <div className="text-xs font-semibold text-white">Groq Bio-Compounding Engine</div>
                     </div>
                   </div>
-                  <span className="text-xs font-mono text-[#2b4c7e] font-medium">Groq Engine</span>
+                  <span className="text-[11px] font-mono text-[#38ef7d]">Synthesis</span>
                 </div>
 
-                <div className="flex justify-center -my-2 text-[#1e3a2b]">
-                  <ArrowDown className="w-4 h-4 text-[#1e3a2b]" />
+                <div className="flex justify-center -my-1 text-[#38ef7d]">
+                  <ArrowDown className="w-3.5 h-3.5 text-[#38ef7d]" />
                 </div>
 
-                {/* Node 3: Resource */}
-                <div className="flex items-center justify-between p-3.5 rounded-xl bg-[#edf2ee] border border-[#1e3a2b]/20">
+                {/* Node 3: Secondary Feedstock */}
+                <div className="flex items-center justify-between p-3 rounded-xl bg-[#0f2820] border border-[#38ef7d]/30">
                   <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 rounded-lg bg-[#1e3a2b] flex items-center justify-center text-white">
-                      <Layers className="w-4 h-4" />
+                    <div className="w-7 h-7 rounded-lg bg-[#2e6047] flex items-center justify-center text-white">
+                      <Layers className="w-3.5 h-3.5 text-[#38ef7d]" />
                     </div>
                     <div>
-                      <div className="text-xs font-mono uppercase tracking-wider text-[#1e3a2b]">Refinement</div>
-                      <div className="text-sm font-semibold text-[#1c211f]">VALUABLE RESOURCE</div>
+                      <div className="text-[10px] font-mono uppercase tracking-wider text-[#38ef7d]">Secondary Resource</div>
+                      <div className="text-xs font-semibold text-white">Valuable Micro-Flakes / Bio-Resin</div>
                     </div>
                   </div>
-                  <span className="text-xs text-[#1e3a2b] font-mono">Biomass / Fiber</span>
+                  <span className="text-[11px] text-[#a5f3fc] font-mono">Feedstock</span>
                 </div>
 
-                <div className="flex justify-center -my-2 text-[#1e3a2b]">
-                  <ArrowDown className="w-4 h-4 text-[#1e3a2b]" />
+                <div className="flex justify-center -my-1 text-[#38ef7d]">
+                  <ArrowDown className="w-3.5 h-3.5 text-[#38ef7d]" />
                 </div>
 
-                {/* Node 4: Product */}
-                <div className="flex items-center justify-between p-3.5 rounded-xl bg-white border-2 border-[#1e3a2b]">
+                {/* Node 4: Finished Product */}
+                <div className="flex items-center justify-between p-3 rounded-xl bg-[#142a3e] border border-[#38bdf8]/50">
                   <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 rounded-lg bg-[#1e3a2b] flex items-center justify-center text-white">
-                      <Box className="w-4 h-4" />
+                    <div className="w-7 h-7 rounded-lg bg-gradient-to-r from-[#11998e] to-[#38ef7d] flex items-center justify-center text-[#080d13]">
+                      <Box className="w-3.5 h-3.5 font-bold" />
                     </div>
                     <div>
-                      <div className="text-xs font-mono uppercase tracking-wider text-[#1e3a2b]">Output</div>
-                      <div className="text-sm font-semibold text-[#1c211f]">SUSTAINABLE PRODUCT</div>
+                      <div className="text-[10px] font-mono uppercase tracking-wider text-[#a5f3fc]">Alternative Product</div>
+                      <div className="text-xs font-bold text-white">Sustainable Replacement</div>
                     </div>
                   </div>
-                  <span className="text-xs font-semibold text-[#1e3a2b]">NEW LIFE ↺</span>
+                  <span className="text-[11px] font-mono text-[#38ef7d] font-semibold">New Life ↺</span>
                 </div>
               </div>
 
               {/* Loop Footnote */}
-              <div className="mt-5 pt-4 border-t border-[#e6e8e5] text-center">
-                <p className="text-xs text-[#667069] leading-relaxed">
-                  Every output becomes the organic or technical nutrient for the next generation of products.
+              <div className="mt-4 pt-3 border-t border-[#243547] text-center">
+                <p className="text-xs text-[#94a3b8] leading-relaxed">
+                  Eliminates reliance on virgin petrochemicals and locks carbon in durable local products.
                 </p>
               </div>
             </div>

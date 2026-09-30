@@ -1,21 +1,96 @@
-import { AnalysisResponse } from "./types";
+import { AnalysisResponse, AnalyzeRequestBody } from "./types";
 
-export function validateMaterialInput(input: unknown): { valid: boolean; error?: string; value: string } {
-  if (typeof input !== "string") {
-    return { valid: false, error: "Material must be a valid text string.", value: "" };
+export function validateAnalyzeRequest(body: unknown): {
+  valid: boolean;
+  error?: string;
+  data?: AnalyzeRequestBody;
+} {
+  if (!body || typeof body !== "object") {
+    return { valid: false, error: "Request body must be a valid JSON object." };
   }
 
-  const trimmed = input.trim();
+  const obj = body as Record<string, unknown>;
+  const mode = (obj.mode as string) || "single";
 
-  if (trimmed.length === 0) {
-    return { valid: false, error: "Please provide a waste material to analyze.", value: "" };
+  if (mode === "single") {
+    const mat = typeof obj.material === "string" ? obj.material.trim() : "";
+    if (!mat) {
+      return { valid: false, error: "Please enter a waste material to analyze." };
+    }
+    if (mat.length > 250) {
+      return { valid: false, error: "Material description is too long (max 250 characters)." };
+    }
+    return {
+      valid: true,
+      data: {
+        mode: "single",
+        material: mat,
+        targetGoal: typeof obj.targetGoal === "string" ? obj.targetGoal.trim() : undefined
+      }
+    };
   }
 
-  if (trimmed.length > 200) {
-    return { valid: false, error: "Material description must be under 200 characters.", value: trimmed };
+  if (mode === "multi_blend") {
+    const rawList = Array.isArray(obj.materials)
+      ? obj.materials
+      : typeof obj.material === "string"
+      ? obj.material.split(/,|\band\b|\bwith\b|\b\+\b/).map((s) => s.trim())
+      : [];
+
+    const materials = rawList
+      .filter((s): s is string => typeof s === "string" && s.trim().length > 0)
+      .map((s) => s.trim())
+      .slice(0, 6);
+
+    if (materials.length === 0) {
+      return { valid: false, error: "Please specify at least 2 waste items to blend." };
+    }
+
+    return {
+      valid: true,
+      data: {
+        mode: "multi_blend",
+        materials,
+        material: materials.join(" + "),
+        targetGoal: typeof obj.targetGoal === "string" ? obj.targetGoal.trim() : undefined
+      }
+    };
   }
 
-  return { valid: true, value: trimmed };
+  if (mode === "material_swap") {
+    const currentProduct = typeof obj.currentProduct === "string" ? obj.currentProduct.trim() : "";
+    const currentResource = typeof obj.currentResource === "string" ? obj.currentResource.trim() : "";
+    const availableWaste = typeof obj.material === "string" ? obj.material.trim() : "";
+
+    if (!currentProduct && !currentResource) {
+      return { valid: false, error: "Please provide the product and conventional resource you want to find an alternative for." };
+    }
+
+    return {
+      valid: true,
+      data: {
+        mode: "material_swap",
+        currentProduct,
+        currentResource,
+        material: availableWaste || `${currentProduct} (${currentResource})`,
+        targetGoal: typeof obj.targetGoal === "string" ? obj.targetGoal.trim() : undefined
+      }
+    };
+  }
+
+  // Fallback default
+  const defaultMat = typeof obj.material === "string" ? obj.material.trim() : "";
+  if (!defaultMat) {
+    return { valid: false, error: "Please enter a valid material or product description." };
+  }
+
+  return {
+    valid: true,
+    data: {
+      mode: "single",
+      material: defaultMat
+    }
+  };
 }
 
 export function validateAnalysisResponse(data: unknown): data is AnalysisResponse {
@@ -46,26 +121,6 @@ export function validateAnalysisResponse(data: unknown): data is AnalysisRespons
     !hasString("confidence")
   ) {
     return false;
-  }
-
-  const productIdeas = obj.productIdeas as unknown[];
-  if (productIdeas.length === 0) return false;
-  for (const item of productIdeas) {
-    if (!item || typeof item !== "object") return false;
-    const p = item as Record<string, unknown>;
-    if (typeof p.name !== "string" || typeof p.description !== "string" || typeof p.benefit !== "string") {
-      return false;
-    }
-  }
-
-  const steps = obj.transformationSteps as unknown[];
-  if (steps.length === 0) return false;
-  for (const item of steps) {
-    if (!item || typeof item !== "object") return false;
-    const s = item as Record<string, unknown>;
-    if (typeof s.step !== "number" || typeof s.title !== "string" || typeof s.description !== "string") {
-      return false;
-    }
   }
 
   return true;

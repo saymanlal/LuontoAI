@@ -12,19 +12,22 @@ import { CommunityValue } from "@/components/CommunityValue";
 import { FinlandSection } from "@/components/FinlandSection";
 import { ImpactCounter } from "@/components/ImpactCounter";
 import { Footer } from "@/components/Footer";
-import { AnalysisResponse } from "@/lib/types";
+import { NorthernLightsCanvas } from "@/components/NorthernLightsCanvas";
+import { AnalysisResponse, AnalyzeRequestBody } from "@/lib/types";
 import { AlertCircle, RefreshCw } from "lucide-react";
 
 export default function Home() {
-  const [currentMaterial, setCurrentMaterial] = useState<string>("");
+  const [currentRequest, setCurrentRequest] = useState<AnalyzeRequestBody>({
+    mode: "single",
+    material: "Coffee Grounds"
+  });
+  const [explorerMode, setExplorerMode] = useState<"single" | "multi_blend" | "material_swap">("single");
   const [analysisResult, setAnalysisResult] = useState<AnalysisResponse | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const handleAnalyze = async (material: string) => {
-    if (!material.trim()) return;
-
-    setCurrentMaterial(material);
+  const handleAnalyze = async (request: AnalyzeRequestBody) => {
+    setCurrentRequest(request);
     setIsLoading(true);
     setErrorMessage(null);
 
@@ -34,7 +37,7 @@ export default function Home() {
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ material: material.trim() })
+        body: JSON.stringify(request)
       });
 
       if (!response.ok) {
@@ -66,11 +69,19 @@ export default function Home() {
     }
   };
 
-  const handleScrollToExplorer = (suggested?: string) => {
-    if (suggested) {
-      setCurrentMaterial(suggested);
-      handleAnalyze(suggested);
+  const handleTriggerMode = (mode?: string, suggested?: string, goal?: string) => {
+    if (mode === "multi_blend" || mode === "material_swap" || mode === "single") {
+      setExplorerMode(mode);
     }
+
+    if (suggested) {
+      handleAnalyze({
+        mode: (mode as "single" | "multi_blend" | "material_swap") || "single",
+        material: suggested,
+        targetGoal: goal
+      });
+    }
+
     const el = document.getElementById("explorer");
     if (el) {
       el.scrollIntoView({ behavior: "smooth" });
@@ -87,45 +98,50 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
-      {/* Top Sticky Navigation */}
-      <Navbar onExploreClick={() => handleScrollToExplorer()} />
+    <div className="flex flex-col min-h-screen text-[#f1f5f9] relative">
+      {/* Dynamic Northern Lights Background & Gentle Falling Snow */}
+      <NorthernLightsCanvas />
 
-      <main className="flex-grow">
-        {/* Editorial Hero */}
+      {/* Top Frosted Arctic Sticky Navigation */}
+      <Navbar onExploreClick={(mode) => handleTriggerMode(mode)} />
+
+      <main className="flex-grow z-10">
+        {/* Editorial Arctic Hero */}
         <Hero
-          onExploreClick={() => handleScrollToExplorer()}
+          onExploreClick={() => handleTriggerMode("single")}
+          onMultiBlendClick={() => handleTriggerMode("multi_blend")}
           onHowItWorksClick={() => {
             const el = document.getElementById("how-it-works");
             if (el) el.scrollIntoView({ behavior: "smooth" });
           }}
         />
 
-        {/* Material Explorer Input Area */}
+        {/* Enhanced 3-Mode Material Explorer */}
         <MaterialExplorer
           onAnalyze={handleAnalyze}
           isLoading={isLoading}
-          activeMaterial={currentMaterial}
+          initialMode={explorerMode}
+          activeMaterial={currentRequest.material}
         />
 
         {/* Friendly Error State */}
         {errorMessage && (
           <section className="py-6 max-w-3xl mx-auto px-4 sm:px-6">
-            <div className="p-6 rounded-2xl bg-[#fbfbf9] border border-[#cbd2cb] flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+            <div className="p-6 rounded-2xl bg-[#142334] border border-red-500/40 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
               <div className="flex items-center space-x-3">
-                <AlertCircle className="w-6 h-6 text-[#667069] shrink-0" />
+                <AlertCircle className="w-6 h-6 text-red-400 shrink-0" />
                 <div>
-                  <h4 className="text-sm font-semibold text-[#1c211f]">
-                    We couldn’t analyze this material right now.
+                  <h4 className="text-sm font-semibold text-white">
+                    We couldn’t analyze this material combination right now.
                   </h4>
-                  <p className="text-xs text-[#667069] mt-0.5">
+                  <p className="text-xs text-[#94a3b8] mt-0.5">
                     {errorMessage}
                   </p>
                 </div>
               </div>
               <button
-                onClick={() => handleAnalyze(currentMaterial || "Coffee Grounds")}
-                className="inline-flex items-center space-x-2 px-4 py-2.5 rounded-lg bg-[#1e3a2b] hover:bg-[#2d5a43] text-white text-xs font-medium transition-all shrink-0 cursor-pointer"
+                onClick={() => handleAnalyze(currentRequest)}
+                className="nordic-button-primary inline-flex items-center space-x-2 px-4 py-2.5 rounded-lg text-xs font-medium transition-all shrink-0 cursor-pointer"
               >
                 <RefreshCw className="w-3.5 h-3.5" />
                 <span>Try Again</span>
@@ -143,20 +159,20 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <ProductPossibilities
             ideas={[]}
-            onSelectSample={(mat) => handleScrollToExplorer(mat)}
+            onSelectSample={(mat, goal) => handleTriggerMode("single", mat, goal)}
           />
         </div>
 
         {/* Tourism & Industry Applications */}
         <TourismApplications
-          onSelectSectorMaterial={(mat) => handleScrollToExplorer(mat)}
+          onSelectSectorMaterial={(mat, goal) => handleTriggerMode("single", mat, goal)}
         />
 
         {/* Circular Economy Flow */}
         <CircularFlow />
 
         {/* Community Value Formula */}
-        <CommunityValue onExploreClick={() => handleScrollToExplorer()} />
+        <CommunityValue onExploreClick={() => handleTriggerMode("single")} />
 
         {/* Finland Sustainability Heritage */}
         <FinlandSection />

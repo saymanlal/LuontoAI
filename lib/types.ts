@@ -2,6 +2,8 @@ export interface ProductIdea {
   name: string;
   description: string;
   benefit: string;
+  suitabilityForTarget?: string;
+  compositeSynergy?: string;
 }
 
 export interface TransformationStep {
@@ -10,8 +12,20 @@ export interface TransformationStep {
   description: string;
 }
 
+export interface MaterialComparison {
+  conventionalMaterial: string;
+  circularReplacement: string;
+  pros: string[];
+  cons: string[];
+  costFeasibility: string;
+  durabilityComparison: string;
+}
+
 export interface AnalysisResponse {
+  mode?: "single" | "multi_blend" | "product_target" | "material_swap";
   material: string;
+  materialsList?: string[];
+  targetGoal?: string;
   category: string;
   resourcePotential: string;
   resourceDescription: string;
@@ -28,8 +42,15 @@ export interface AnalysisResponse {
   limitations: string[];
   confidence: string;
   isFallback?: boolean;
+  materialComparison?: MaterialComparison;
+  blendSynergyAnalysis?: string;
 }
 
 export interface AnalyzeRequestBody {
-  material: string;
+  mode?: "single" | "multi_blend" | "product_target" | "material_swap";
+  material?: string;
+  materials?: string[];
+  targetGoal?: string;
+  currentProduct?: string;
+  currentResource?: string;
 }

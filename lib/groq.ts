@@ -1,96 +1,101 @@
-import { AnalysisResponse } from "./types";
+import { AnalysisResponse, AnalyzeRequestBody } from "./types";
 import { validateAnalysisResponse } from "./validation";
 
-// Groq API Endpoint
 const GROQ_BASE_URL = "https://api.groq.com/openai/v1";
 
-const SUSTAINABILITY_SYSTEM_PROMPT = `You are the LuontoAI Sustainability Analyst, an advanced AI system specialized in circular economy, resource discovery, and sustainable innovation inspired by Nordic ecological design principles.
+const SUSTAINABILITY_SYSTEM_PROMPT = `You are the LuontoAI Sustainability Analyst & Circular Materials Engineer, an advanced system specializing in Nordic bioeconomy, circular engineering, material substitutions, and zero-waste cascades.
 
-Analyze the user-provided waste material and identify realistic opportunities for reuse, recovery, and transformation.
-The core discovery flow is: WASTE → RESOURCE → PRODUCT → NEW LIFE.
+The platform provides 3 distinct modes:
+1. "single": Discover resource potential, products, and lifecycle from a single waste stream.
+2. "multi_blend": Analyze how MULTIPLE waste streams can be combined/compounded together (e.g. Spent Coffee Grounds + Recycled Plastic HDPE, or Sawdust + Cardboard Pulp + Food Starch) into high-performance composite products.
+3. "material_swap": Compare a user's current conventional product/resource against circular alternatives made from available waste streams, providing a rigorous Pros & Cons comparison, cost feasibility, and durability evaluation.
 
-Prioritize:
-- realistic material pathways
-- practical applications (hotels, restaurants, tourism destinations, communities, light manufacturing)
-- circular economy principles
-- sustainable alternatives
-- responsible tourism and local resource loops
+If a "targetGoal" is specified (e.g. "hotel bathroom amenities", "lightweight structural furniture", "thermal insulation", "acoustic wall panels"), TAILOR the product ideas and recommendations specifically towards that target objective!
 
-Distinguish established reuse pathways from speculative ideas.
-Never invent scientific facts.
-Never fabricate certifications.
-Never fabricate lifecycle assessments.
-Never claim exact carbon, water, or waste savings without reliable data.
-When quantitative environmental information is uncertain, use qualitative language or explicitly label values as illustrative estimates.
-Mention relevant technical, biological, or logistical limitations.
-Use concise, refined, professional language suitable for a public-facing sustainability product.
-Do not respond like a chatbot.
+Principles:
+- Distinguish established commercial pathways from emerging circular innovations.
+- Deliver authentic materials science (tensile properties, binders, thermal characteristics, degradation).
+- Never fabricate fake certifications or unverified lifecycle numbers.
+- Provide realistic limitations (moisture sensitivity, binder ratios, sorting purity).
+- Return clean, professional, non-chatbot structured JSON.
 
-Return ONLY a valid JSON object matching this schema exactly:
+Return ONLY a valid JSON matching this schema:
 {
-  "material": string (Title-cased clean name of the waste material),
-  "category": string (e.g. Organic Food & Beverage Residuals, Thermoplastics, Lignocellulosic Biomass, etc.),
-  "resourcePotential": string (Concise high-level technical definition of the recovered resource),
-  "resourceDescription": string (2-3 sentences explaining the biochemical/physical properties and why it holds value),
+  "mode": "single" | "multi_blend" | "product_target" | "material_swap",
+  "material": string (Clean title-cased name of the waste material or combined stream),
+  "materialsList": string[] (Optional list of individual waste inputs if multi_blend),
+  "targetGoal": string (The target domain if provided),
+  "category": string (e.g. Lignocellulosic Bio-Composite, Thermoplastic Polymer Blend, etc.),
+  "resourcePotential": string (Concise definition of the recovered resource/feedstock),
+  "resourceDescription": string (2-3 sentences explaining chemical/physical traits and structural synergy),
+  "blendSynergyAnalysis": string (If multi-material blend, explain how the components reinforce each other chemically/mechanically. Otherwise concise synergy note),
   "productIdeas": [
     {
-      "name": string (Clear product name),
-      "description": string (How it is made and what it does),
-      "benefit": string (Specific sustainability advantage)
+      "name": string (Concrete product name),
+      "description": string (Manufacturing method and formulation),
+      "benefit": string (Circular sustainability advantage),
+      "suitabilityForTarget": string (How this directly answers the target goal),
+      "compositeSynergy": string (Why this blend or material is uniquely suited)
     }
-  ] (Provide 3 to 5 realistic product ideas),
-  "replacementOpportunity": string (What virgin or fossil-based material/resource this replaces),
-  "whyThisAlternative": string (Short explanation of the environmental, economic, or logistical relevance),
+  ] (Provide 3 to 5 realistic recommendations),
+  "replacementOpportunity": string (Conventional fossil/virgin resource displaced),
+  "whyThisAlternative": string (Why this alternative is relevant for economics, supply chain, and local circularity),
+  "materialComparison": {
+    "conventionalMaterial": string (Conventional material being compared),
+    "circularReplacement": string (Recommended circular waste alternative),
+    "pros": string[] (3-4 bullet points of genuine advantages: carbon reduction, cost stability, weight, biodegradability),
+    "cons": string[] (2-3 genuine engineering/logistics trade-offs: tensile limits, waterproofing needs, processing temperatures),
+    "costFeasibility": string (Realistic economic estimate: comparable, 10-15% premium initially, or cost-saving at scale),
+    "durabilityComparison": string (Expected lifespan and structural resilience vs conventional)
+  },
   "transformationSteps": [
-    {
-      "step": 1,
-      "title": string (Action title, e.g. Collect & Segregate),
-      "description": string (Practical process description)
-    },
-    {
-      "step": 2,
-      "title": string,
-      "description": string
-    },
-    {
-      "step": 3,
-      "title": string,
-      "description": string
-    },
-    {
-      "step": 4,
-      "title": string,
-      "description": string
-    },
-    {
-      "step": 5,
-      "title": string,
-      "description": string
-    }
-  ] (Exactly 5 progressive transformation steps from waste collection to new circular life),
-  "circularityScore": number (Integer between 0 and 100 representing illustrative circularity potential),
-  "practicalityScore": number (Integer between 0 and 100 representing illustrative real-world feasibility),
-  "wastePotential": string (Qualitative assessment with context, e.g. "High (~75% diversion potential)"),
-  "resourcePotentialEstimate": string (Illustrative estimate of output yield),
-  "waterImpact": string (Qualitative description of water preservation or pollution mitigation),
-  "suitableFor": string[] (Array of 3-5 relevant sectors, e.g. ["Hotels & Resorts", "Local Bakeries", "Urban Agriculture"]),
-  "limitations": string[] (Array of 2-3 genuine technical, contamination, or logistical constraints),
+    { "step": 1, "title": string, "description": string },
+    { "step": 2, "title": string, "description": string },
+    { "step": 3, "title": string, "description": string },
+    { "step": 4, "title": string, "description": string },
+    { "step": 5, "title": string, "description": string }
+  ] (5 sequential steps from collection to finished circular deployment),
+  "circularityScore": number (0-100 illustrative assessment),
+  "practicalityScore": number (0-100 illustrative assessment),
+  "wastePotential": string (Qualitative assessment),
+  "resourcePotentialEstimate": string (Illustrative output yield),
+  "waterImpact": string (Water preservation/pollution impact),
+  "suitableFor": string[] (3-5 relevant industry sectors),
+  "limitations": string[] (2-3 genuine constraints),
   "confidence": string (e.g. "High — Mature industrial recycling pathway")
 }`;
 
-export async function analyzeMaterialWithGroq(material: string): Promise<AnalysisResponse | null> {
-  // Support GROQ_API_KEY (or legacy XAI_API_KEY if user supplied it under either name)
+export async function analyzeMaterialWithGroq(req: AnalyzeRequestBody): Promise<AnalysisResponse | null> {
   const apiKey = process.env.GROQ_API_KEY || process.env.XAI_API_KEY;
   if (!apiKey || apiKey.trim() === "") {
     return null;
   }
 
-  // Fast and powerful Groq model default: llama-3.3-70b-versatile or configurable
-  const model = process.env.GROQ_MODEL || process.env.XAI_MODEL || "llama-3.3-70b-versatile";
+  const model = process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
+
+  let prompt = "";
+  if (req.mode === "multi_blend" && req.materials && req.materials.length > 0) {
+    prompt = `Mode: Multi-Material Waste Blend.
+Input Waste Materials: ${req.materials.join(", ")}
+${req.targetGoal ? `Target Specific Product/Domain: "${req.targetGoal}"` : ""}
+Task: Analyze how these distinct waste materials can be co-processed or compounded together into high-performance circular composite products. Detail the blend synergy, formulate 3-5 product ideas (aligned with target if provided), and provide comparison with conventional alternatives.`;
+  } else if (req.mode === "material_swap") {
+    prompt = `Mode: Alternative Material Swap & Comparison.
+Current Conventional Product: "${req.currentProduct || "Not specified"}"
+Current Conventional Resource / Material: "${req.currentResource || "Not specified"}"
+Available Waste Stream (if any): "${req.material || "Recommend best circular waste alternative"}"
+${req.targetGoal ? `Target Requirements: "${req.targetGoal}"` : ""}
+Task: Provide an exact circular waste replacement for this conventional product/resource. Provide a detailed Pros vs Cons analysis, cost feasibility, durability comparison, and exact transformation steps to build it.`;
+  } else {
+    prompt = `Mode: Single Material Discovery.
+Waste Material: "${req.material}"
+${req.targetGoal ? `Target Specific Goal/Product: "${req.targetGoal}"` : ""}
+Task: Analyze this waste stream and provide 3-5 circular product possibilities (focused on target if provided), replacement opportunity, metrics, and transformation steps.`;
+  }
 
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 20000); // 20s timeout
+    const timeoutId = setTimeout(() => controller.abort(), 25000);
 
     const response = await fetch(`${GROQ_BASE_URL}/chat/completions`, {
       method: "POST",
@@ -102,7 +107,7 @@ export async function analyzeMaterialWithGroq(material: string): Promise<Analysi
         model,
         messages: [
           { role: "system", content: SUSTAINABILITY_SYSTEM_PROMPT },
-          { role: "user", content: `Analyze this waste material: "${material}"` }
+          { role: "user", content: prompt }
         ],
         temperature: 0.2,
         response_format: { type: "json_object" }
@@ -113,23 +118,21 @@ export async function analyzeMaterialWithGroq(material: string): Promise<Analysi
     clearTimeout(timeoutId);
 
     if (!response.ok) {
-      console.warn(`Groq API responded with status ${response.status}: ${response.statusText}`);
+      console.warn(`Groq API error status ${response.status}: ${response.statusText}`);
       return null;
     }
 
     const payload = await response.json();
     const content = payload?.choices?.[0]?.message?.content;
 
-    if (!content) {
-      return null;
-    }
+    if (!content) return null;
 
     const parsed = JSON.parse(content);
     if (validateAnalysisResponse(parsed)) {
-      return { ...parsed, isFallback: false };
+      return { ...parsed, isFallback: false, mode: req.mode || "single" };
     }
 
-    console.warn("Groq response did not pass strict validation schema:", parsed);
+    console.warn("Groq JSON response did not pass full schema check:", parsed);
     return null;
   } catch (err: unknown) {
     console.warn("Error calling Groq API:", err instanceof Error ? err.message : err);

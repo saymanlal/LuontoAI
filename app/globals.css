@@ -2,19 +2,21 @@
 
 @layer base {
   :root {
-    --background: #fbfbf9;
-    --foreground: #1c211f;
-    --card: #ffffff;
-    --card-foreground: #1c211f;
-    --border: #e6e8e5;
-    --primary: #1e3a2b;
-    --primary-light: #2d5a43;
-    --accent: #2b4c7e;
-    --accent-light: #e8eef5;
-    --sage: #edf2ee;
-    --stone-subtle: #f4f5f2;
-    --charcoal: #232b28;
-    --muted: #667069;
+    --background: #0f1720;
+    --background-subtle: #141f2b;
+    --foreground: #f1f5f9;
+    --card: #152230;
+    --card-foreground: #f1f5f9;
+    --border: #243547;
+    --primary: #2e6047;
+    --primary-light: #3d7d5d;
+    --aurora-green: #38ef7d;
+    --aurora-cyan: #11998e;
+    --aurora-blue: #38bdf8;
+    --ice-cyan: #a5f3fc;
+    --ice-white: #f8fafc;
+    --ice-frost: rgba(186, 230, 253, 0.08);
+    --muted: #94a3b8;
   }
 }
 
@@ -23,20 +25,85 @@ html {
 }
 
 body {
-  background-color: var(--background);
-  color: var(--foreground);
+  background-color: #0b131b;
+  color: #f1f5f9;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
 }
 
+/* Atmospheric Aurora Borealis Northern Lights animation */
+@keyframes aurora-wave-1 {
+  0% { transform: translate(-10%, -10%) rotate(0deg) scale(1); opacity: 0.35; }
+  50% { transform: translate(15%, 5%) rotate(180deg) scale(1.2); opacity: 0.6; }
+  100% { transform: translate(-10%, -10%) rotate(360deg) scale(1); opacity: 0.35; }
+}
+
+@keyframes aurora-wave-2 {
+  0% { transform: translate(10%, 15%) rotate(0deg) scale(1.1); opacity: 0.4; }
+  50% { transform: translate(-15%, -5%) rotate(-180deg) scale(0.9); opacity: 0.65; }
+  100% { transform: translate(10%, 15%) rotate(-360deg) scale(1.1); opacity: 0.4; }
+}
+
+.aurora-layer-1 {
+  animation: aurora-wave-1 25s ease-in-out infinite;
+}
+
+.aurora-layer-2 {
+  animation: aurora-wave-2 30s ease-in-out infinite;
+}
+
+/* Subtle Ice Crystals / Snow particles falling */
+@keyframes snow-drift {
+  0% { transform: translateY(-20px) translateX(0); opacity: 0; }
+  15% { opacity: 0.8; }
+  90% { opacity: 0.8; }
+  100% { transform: translateY(105vh) translateX(60px); opacity: 0; }
+}
+
+.snow-flake {
+  position: absolute;
+  top: -20px;
+  background: white;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: snow-drift linear infinite;
+}
+
+/* Frosted glass Nordic cards */
+.nordic-card {
+  background: rgba(18, 30, 43, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.3);
+}
+
+.nordic-card-glow {
+  background: rgba(18, 30, 43, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(56, 239, 125, 0.25);
+  box-shadow: 0 0 25px -5px rgba(56, 189, 248, 0.15);
+}
+
+.nordic-button-primary {
+  background: linear-gradient(135deg, #1b4d3e 0%, #2e6047 100%);
+  border: 1px solid rgba(56, 239, 125, 0.4);
+  color: #f8fafc;
+  transition: all 0.2s ease;
+}
+
+.nordic-button-primary:hover {
+  background: linear-gradient(135deg, #246350 0%, #3d7d5d 100%);
+  border-color: rgba(56, 239, 125, 0.8);
+  box-shadow: 0 0 15px rgba(56, 239, 125, 0.2);
+}
+
 @media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
+  .aurora-layer-1, .aurora-layer-2, .snow-flake {
+    animation: none !important;
   }
 }
 
@@ -46,14 +113,15 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f4f5f2;
+  background: #0b131b;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd2cb;
+  background: #1e293b;
   border-radius: 4px;
+  border: 1px solid #334155;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #9aa59d;
+  background: #334155;
 }
