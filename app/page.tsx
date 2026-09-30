@@ -1,69 +1,175 @@
-import Image from "next/image";
+"use client";
+
+import React, { useState } from "react";
+import { Navbar } from "@/components/Navbar";
+import { Hero } from "@/components/Hero";
+import { MaterialExplorer } from "@/components/MaterialExplorer";
+import { AnalysisResult } from "@/components/AnalysisResult";
+import { ProductPossibilities } from "@/components/ProductPossibilities";
+import { CircularFlow } from "@/components/CircularFlow";
+import { TourismApplications } from "@/components/TourismApplications";
+import { CommunityValue } from "@/components/CommunityValue";
+import { FinlandSection } from "@/components/FinlandSection";
+import { ImpactCounter } from "@/components/ImpactCounter";
+import { Footer } from "@/components/Footer";
+import { AnalysisResponse } from "@/lib/types";
+import { AlertCircle, RefreshCw } from "lucide-react";
 
 export default function Home() {
+  const [currentMaterial, setCurrentMaterial] = useState<string>("");
+  const [analysisResult, setAnalysisResult] = useState<AnalysisResponse | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const handleAnalyze = async (material: string) => {
+    if (!material.trim()) return;
+
+    setCurrentMaterial(material);
+    setIsLoading(true);
+    setErrorMessage(null);
+
+    try {
+      const response = await fetch("/api/analyze", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ material: material.trim() })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.error || "We couldn't analyze this material right now. Please try again."
+        );
+      }
+
+      const data: AnalysisResponse = await response.json();
+      setAnalysisResult(data);
+
+      // Smooth scroll down to the analysis result
+      setTimeout(() => {
+        const resultEl = document.getElementById("analysis-result");
+        if (resultEl) {
+          resultEl.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, 100);
+    } catch (err: unknown) {
+      console.error("Analysis request error:", err);
+      setErrorMessage(
+        err instanceof Error
+          ? err.message
+          : "We couldn't analyze this material right now."
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleScrollToExplorer = (suggested?: string) => {
+    if (suggested) {
+      setCurrentMaterial(suggested);
+      handleAnalyze(suggested);
+    }
+    const el = document.getElementById("explorer");
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  const handleReset = () => {
+    setAnalysisResult(null);
+    setErrorMessage(null);
+    const el = document.getElementById("explorer");
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <div className="flex flex-col min-h-screen">
+      {/* Top Sticky Navigation */}
+      <Navbar onExploreClick={() => handleScrollToExplorer()} />
+
+      <main className="flex-grow">
+        {/* Editorial Hero */}
+        <Hero
+          onExploreClick={() => handleScrollToExplorer()}
+          onHowItWorksClick={() => {
+            const el = document.getElementById("how-it-works");
+            if (el) el.scrollIntoView({ behavior: "smooth" });
+          }}
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+
+        {/* Material Explorer Input Area */}
+        <MaterialExplorer
+          onAnalyze={handleAnalyze}
+          isLoading={isLoading}
+          activeMaterial={currentMaterial}
+        />
+
+        {/* Friendly Error State */}
+        {errorMessage && (
+          <section className="py-6 max-w-3xl mx-auto px-4 sm:px-6">
+            <div className="p-6 rounded-2xl bg-[#fbfbf9] border border-[#cbd2cb] flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+              <div className="flex items-center space-x-3">
+                <AlertCircle className="w-6 h-6 text-[#667069] shrink-0" />
+                <div>
+                  <h4 className="text-sm font-semibold text-[#1c211f]">
+                    We couldn’t analyze this material right now.
+                  </h4>
+                  <p className="text-xs text-[#667069] mt-0.5">
+                    {errorMessage}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => handleAnalyze(currentMaterial || "Coffee Grounds")}
+                className="inline-flex items-center space-x-2 px-4 py-2.5 rounded-lg bg-[#1e3a2b] hover:bg-[#2d5a43] text-white text-xs font-medium transition-all shrink-0 cursor-pointer"
+              >
+                <RefreshCw className="w-3.5 h-3.5" />
+                <span>Try Again</span>
+              </button>
+            </div>
+          </section>
+        )}
+
+        {/* Live Analysis Result Panel */}
+        {analysisResult && (
+          <AnalysisResult data={analysisResult} onReset={handleReset} />
+        )}
+
+        {/* Static Product Possibilities Showcase Catalog */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <ProductPossibilities
+            ideas={[]}
+            onSelectSample={(mat) => handleScrollToExplorer(mat)}
+          />
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+
+        {/* Tourism & Industry Applications */}
+        <TourismApplications
+          onSelectSectorMaterial={(mat) => handleScrollToExplorer(mat)}
+        />
+
+        {/* Circular Economy Flow */}
+        <CircularFlow />
+
+        {/* Community Value Formula */}
+        <CommunityValue onExploreClick={() => handleScrollToExplorer()} />
+
+        {/* Finland Sustainability Heritage */}
+        <FinlandSection />
+
+        {/* Session Impact Tracker */}
+        <ImpactCounter
+          currentMaterial={analysisResult?.material}
+          hasResult={Boolean(analysisResult)}
+        />
       </main>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }
